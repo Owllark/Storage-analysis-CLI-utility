@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"memory-cli-utility/cmd"
 	"memory-cli-utility/utils"
 	"os"
 )
@@ -14,7 +13,6 @@ var export bool
 var statistics bool
 
 func main() {
-	//LogoOutput()
 	utils.LogoOutput()
 	workingDir, _ := os.Getwd()
 
@@ -33,6 +31,6 @@ func main() {
 	})
 
 	workingDir += "D:\\"
-	cmd.CountSize(directory)
+	StorageAnalysis(directory)
 
 }
