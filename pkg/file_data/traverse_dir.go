@@ -1,4 +1,4 @@
-package internal
+package file_data
 
 import (
 	"os"

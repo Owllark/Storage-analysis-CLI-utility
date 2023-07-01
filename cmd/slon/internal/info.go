@@ -1,7 +1,8 @@
-package main
+package internal
 
 import (
-	"memory-cli-utility/internal"
+	"memory-cli-utility/pkg/file_data"
+	"sort"
 )
 
 type Info struct {
@@ -10,6 +11,20 @@ type Info struct {
 	IsDir    bool
 	Percent  float32
 	Children []Info
+}
+
+type BySizeDescending []Info
+
+func (arr BySizeDescending) Len() int {
+	return len(arr)
+}
+
+func (arr BySizeDescending) Swap(i, j int) {
+	arr[i], arr[j] = arr[j], arr[i]
+}
+
+func (arr BySizeDescending) Less(i, j int) bool {
+	return arr[i].Size < arr[j].Size
 }
 
 func (info *Info) GetSize() int64 {
@@ -24,7 +39,7 @@ func (info *Info) GetSize() int64 {
 	}
 }
 
-func NewInfo(fileInfo internal.FileInfo) Info {
+func NewInfo(fileInfo file_data.FileInfo) Info {
 	var res = Info{
 		Name:     fileInfo.Name,
 		Size:     fileInfo.Size,
@@ -51,7 +66,7 @@ func (info *Info) calculatePercent(totalSize int64) {
 	if !info.IsDir {
 		return
 	}
-	for i, _ := range info.Children {
+	for i := range info.Children {
 		info.Children[i].calculatePercent(info.Size)
 	}
 }
@@ -61,13 +76,25 @@ func (info *Info) CalculateSize() int64 {
 		return info.Size
 	}
 	size := int64(0)
-	for i, _ := range info.Children {
+	for i := range info.Children {
 		size += info.Children[i].CalculateSize()
 	}
 	info.Size = size
 	return size
 }
 
-func (info *Info) Inc() {
-	info.Size = 100
+func SortBySizeDescending(info *Info) {
+	sort.Slice(info.Children, func(i, j int) bool {
+		return info.Children[i].Size > info.Children[j].Size
+	})
+}
+
+func (info *Info) Sort(sortFunc func(info *Info)) {
+	sortFunc(info)
+	if !info.IsDir {
+		return
+	}
+	for i := range info.Children {
+		info.Children[i].Sort(sortFunc)
+	}
 }
