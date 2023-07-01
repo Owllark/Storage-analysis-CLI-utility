@@ -13,32 +13,6 @@ type Info struct {
 	Children []Info
 }
 
-type BySizeDescending []Info
-
-func (arr BySizeDescending) Len() int {
-	return len(arr)
-}
-
-func (arr BySizeDescending) Swap(i, j int) {
-	arr[i], arr[j] = arr[j], arr[i]
-}
-
-func (arr BySizeDescending) Less(i, j int) bool {
-	return arr[i].Size < arr[j].Size
-}
-
-func (info *Info) GetSize() int64 {
-	if info.IsDir {
-		size := int64(0)
-		for _, child := range info.Children {
-			size += child.GetSize()
-		}
-		return size
-	} else {
-		return info.Size
-	}
-}
-
 func NewInfo(fileInfo file_data.FileInfo) Info {
 	var res = Info{
 		Name:     fileInfo.Name,
@@ -71,13 +45,40 @@ func (info *Info) calculatePercent(totalSize int64) {
 	}
 }
 
-func (info *Info) CalculateSize() int64 {
+/*func (info *Info) CalculatePercent() {
+	start := time.Now()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go info.calculatePercent(info.Size, &wg)
+	wg.Wait()
+	elapsed := time.Since(start)
+	fmt.Printf("Program execution time: %s\n", elapsed)
+
+}
+
+func (info *Info) calculatePercent(totalSize int64, wg *sync.WaitGroup) {
+	defer wg.Done()
+	info.Percent = 100.0 * float32(info.Size) / float32(totalSize)
+	if !info.IsDir {
+		return
+	}
+	for i := range info.Children {
+		wg.Add(1)
+		go info.Children[i].calculatePercent(info.Size, wg)
+	}
+}*/
+
+func (info *Info) CalculateSize() {
+	info.calculateSize()
+}
+
+func (info *Info) calculateSize() int64 {
 	if !info.IsDir {
 		return info.Size
 	}
 	size := int64(0)
 	for i := range info.Children {
-		size += info.Children[i].CalculateSize()
+		size += info.Children[i].calculateSize()
 	}
 	info.Size = size
 	return size

@@ -4,54 +4,69 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"memory-cli-utility/cmd/slon/internal"
 	"memory-cli-utility/utils"
 	"os"
 )
 
-type analysisConfig struct {
-	sort       bool
-	percentage bool
-	export     bool
-	statistics bool
-}
-
-type outputConfig struct {
-	percentage bool
-}
-
 var sortFlag bool
 var percentageFlag bool
-var exportFlag bool
+var exportFlag string
 var statisticsFlag bool
 
 func main() {
-	utils.LogoOutput()
-	workingDir, _ := os.Getwd()
 
 	flag.BoolVar(&sortFlag, "s", false, "sorting files and directories")
 	flag.BoolVar(&percentageFlag, "p", false, "output percent of parent directory size")
-	flag.BoolVar(&exportFlag, "e", false, "write results of analyse into file")
+	flag.StringVar(&exportFlag, "e", "", "write results of analyse into file")
 	flag.BoolVar(&statisticsFlag, "stat", false, "output statistics of storage using")
+
+	// Flags and Args processing
 
 	flag.Parse()
 
-	directory := flag.Arg(0)
+	args := flag.Args()
 
-	flag.VisitAll(func(f *flag.Flag) {
-		fmt.Printf(" -%s\t\t%s\n", f.Name, f.Usage)
-	})
+	var directory string
+	var outputFile string
 
-	workingDir += "D:\\"
-	info, err := StorageAnalysis(directory, &analysisConfig{
-		sort:       sortFlag,
-		percentage: percentageFlag,
-		export:     exportFlag,
-		statistics: statisticsFlag,
+	if len(args) == 0 {
+		utils.LogoOutput()
+		flag.VisitAll(func(f *flag.Flag) {
+			fmt.Printf(" -%s\t\t%s\n", f.Name, f.Usage)
+		})
+		return
+	}
+
+	directory = args[0]
+
+	if len(args) > 1 {
+		log.Fatal("Too many arguments")
+	}
+
+	// Analysis
+
+	info, err := internal.StorageAnalysis(directory, &internal.AnalysisConfig{
+		Sort:       sortFlag,
+		Percentage: percentageFlag,
+		Statistics: statisticsFlag,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	InfoOutput(&info, &outputConfig{
-		percentage: percentageFlag,
-	})
+
+	// Output
+
+	outputConfig := &internal.OutputConfig{
+		Percentage: percentageFlag,
+	}
+	internal.InfoOutput(&info, outputConfig, os.Stdout)
+
+	if exportFlag != "" {
+		file, err := os.Create(outputFile)
+		if err != nil {
+			fmt.Printf("error writing to the file '%s'\n", outputFile)
+		}
+		internal.InfoOutput(&info, outputConfig, file)
+	}
 }
