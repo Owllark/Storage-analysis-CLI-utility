@@ -12,14 +12,14 @@ import (
 var sortFlag bool
 var percentageFlag bool
 var exportFlag string
-var statisticsFlag bool
+var nestingFlag uint
 
 func main() {
 
 	flag.BoolVar(&sortFlag, "s", false, "sorting files and directories")
 	flag.BoolVar(&percentageFlag, "p", false, "output percent of parent directory size")
 	flag.StringVar(&exportFlag, "e", "", "write results of analyse into file")
-	flag.BoolVar(&statisticsFlag, "stat", false, "output statistics of storage using")
+	flag.UintVar(&nestingFlag, "n", ^uint(0), "maximal nestingFlag of files")
 
 	// Flags and Args processing
 
@@ -49,7 +49,6 @@ func main() {
 	info, err := internal.StorageAnalysis(directory, &internal.AnalysisConfig{
 		Sort:       sortFlag,
 		Percentage: percentageFlag,
-		Statistics: statisticsFlag,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -59,6 +58,7 @@ func main() {
 
 	outputConfig := &internal.OutputConfig{
 		Percentage: percentageFlag,
+		MaxNesting: nestingFlag,
 	}
 	internal.InfoOutput(&info, outputConfig, os.Stdout)
 

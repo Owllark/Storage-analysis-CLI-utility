@@ -7,7 +7,6 @@ import (
 type AnalysisConfig struct {
 	Sort       bool
 	Percentage bool
-	Statistics bool
 }
 
 func StorageAnalysis(path string, config *AnalysisConfig) (Info, error) {
