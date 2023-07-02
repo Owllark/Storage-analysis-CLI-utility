@@ -22,4 +22,4 @@ The flags are:
 s - sorting files and directories
 p - output percent of parent directory size
 e - write results of analyse into file (example of usage: -e=log.txt)
-n - set maximal nesting level of directories to output
+n - set maximal nesting level of directories to output (example of usage: -n=2)
