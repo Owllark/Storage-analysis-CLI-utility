@@ -1,7 +1,7 @@
-package internal
+package analysis
 
 import (
-	"memory-cli-utility/pkg/file_data"
+	"memory-cli-utility/pkg/filedata"
 )
 
 type AnalysisConfig struct {
@@ -10,12 +10,13 @@ type AnalysisConfig struct {
 }
 
 func StorageAnalysis(path string, config *AnalysisConfig) (Info, error) {
-	var res file_data.FileInfo
+	var res filedata.FileInfo
 	var err error
-	res, err = file_data.TraverseDirectory(path)
+	res, err = filedata.TraverseDirectoryAsync(path)
 	if err != nil {
 		return Info{}, err
 	}
+
 	info := NewInfo(res)
 	info.CalculateSize()
 

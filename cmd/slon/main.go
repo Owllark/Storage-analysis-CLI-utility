@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"memory-cli-utility/cmd/slon/internal"
+	"memory-cli-utility/cmd/slon/internal/analysis"
 	"memory-cli-utility/utils"
 	"os"
 )
@@ -46,7 +46,7 @@ func main() {
 
 	// Analysis
 
-	info, err := internal.StorageAnalysis(directory, &internal.AnalysisConfig{
+	info, err := analysis.StorageAnalysis(directory, &analysis.AnalysisConfig{
 		Sort:       sortFlag,
 		Percentage: percentageFlag,
 	})
@@ -56,17 +56,17 @@ func main() {
 
 	// Output
 
-	outputConfig := &internal.OutputConfig{
+	outputConfig := &analysis.OutputConfig{
 		Percentage: percentageFlag,
 		MaxNesting: nestingFlag,
 	}
-	internal.InfoOutput(&info, outputConfig, os.Stdout)
+	analysis.InfoOutput(&info, outputConfig, os.Stdout)
 
 	if exportFlag != "" {
 		file, err := os.Create(outputFile)
 		if err != nil {
 			fmt.Printf("error writing to the file '%s'\n", outputFile)
 		}
-		internal.InfoOutput(&info, outputConfig, file)
+		analysis.InfoOutput(&info, outputConfig, file)
 	}
 }

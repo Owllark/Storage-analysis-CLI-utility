@@ -1,19 +1,20 @@
-package internal
+package analysis
 
 import (
-	"memory-cli-utility/pkg/file_data"
+	"memory-cli-utility/pkg/filedata"
 	"sort"
+	"sync"
 )
 
 type Info struct {
 	Name     string
 	Size     int64
 	IsDir    bool
-	Percent  float32
+	Percent  float64
 	Children []Info
 }
 
-func NewInfo(fileInfo file_data.FileInfo) Info {
+func NewInfo(fileInfo filedata.FileInfo) Info {
 	var res = Info{
 		Name:     fileInfo.Name,
 		Size:     fileInfo.Size,
@@ -36,7 +37,7 @@ func (info *Info) CalculatePercent() {
 }
 
 func (info *Info) calculatePercent(totalSize int64) {
-	info.Percent = 100.0 * float32(info.Size) / float32(totalSize)
+	info.Percent = 100.0 * float64(info.Size) / float64(totalSize)
 	if !info.IsDir {
 		return
 	}
@@ -45,28 +46,25 @@ func (info *Info) calculatePercent(totalSize int64) {
 	}
 }
 
-/*func (info *Info) CalculatePercent() {
-	start := time.Now()
+func (info *Info) CalculatePercentAsync() {
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go info.calculatePercent(info.Size, &wg)
+	go info.calculatePercentAsync(info.Size, &wg)
 	wg.Wait()
-	elapsed := time.Since(start)
-	fmt.Printf("Program execution time: %s\n", elapsed)
 
 }
 
-func (info *Info) calculatePercent(totalSize int64, wg *sync.WaitGroup) {
+func (info *Info) calculatePercentAsync(totalSize int64, wg *sync.WaitGroup) {
 	defer wg.Done()
-	info.Percent = 100.0 * float32(info.Size) / float32(totalSize)
+	info.Percent = 100.0 * float64(info.Size) / float64(totalSize)
 	if !info.IsDir {
 		return
 	}
 	for i := range info.Children {
 		wg.Add(1)
-		go info.Children[i].calculatePercent(info.Size, wg)
+		go info.Children[i].calculatePercentAsync(info.Size, wg)
 	}
-}*/
+}
 
 func (info *Info) CalculateSize() {
 	info.calculateSize()

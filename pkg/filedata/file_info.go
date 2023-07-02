@@ -1,4 +1,4 @@
-package file_data
+package filedata
 
 type FileInfo struct {
 	Name     string
