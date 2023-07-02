@@ -17,6 +17,7 @@ func LogoOutput() {
 	}
 	fmt.Println(string(text))
 }
+
 func GetPathToUtilityDir() (string, error) {
 	exePath, err := os.Executable()
 	if err != nil {

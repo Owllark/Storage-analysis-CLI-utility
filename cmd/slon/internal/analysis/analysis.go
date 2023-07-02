@@ -12,7 +12,7 @@ type AnalysisConfig struct {
 func StorageAnalysis(path string, config *AnalysisConfig) (Info, error) {
 	var res filedata.FileInfo
 	var err error
-	res, err = filedata.TraverseDirectoryAsync(path)
+	res, err = filedata.TraverseDirectory(path)
 	if err != nil {
 		return Info{}, err
 	}

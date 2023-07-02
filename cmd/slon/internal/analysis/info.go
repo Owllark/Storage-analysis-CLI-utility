@@ -6,6 +6,7 @@ import (
 	"sync"
 )
 
+// Info struct stores information about file that can be shown to user
 type Info struct {
 	Name     string
 	Size     int64
@@ -14,6 +15,7 @@ type Info struct {
 	Children []Info
 }
 
+// NewInfo creates Info based on given filedata.FileInfo parameter
 func NewInfo(fileInfo filedata.FileInfo) Info {
 	var res = Info{
 		Name:     fileInfo.Name,
@@ -32,10 +34,15 @@ func NewInfo(fileInfo filedata.FileInfo) Info {
 	return res
 }
 
+// CalculatePercent runs recursion for calculating the percentage
+// that the file occupies in the parent directory
 func (info *Info) CalculatePercent() {
 	info.calculatePercent(info.Size)
 }
 
+// calculatePercent recursive function for calculating the percentage
+// that the file occupies in the parent directory
+// get totalSize - size of parent directory
 func (info *Info) calculatePercent(totalSize int64) {
 	info.Percent = 100.0 * float64(info.Size) / float64(totalSize)
 	if !info.IsDir {
@@ -46,6 +53,9 @@ func (info *Info) calculatePercent(totalSize int64) {
 	}
 }
 
+// CalculatePercentAsync method runs recursion for calculating the percentage
+// that the file occupies in the parent directory
+// Using concurrency
 func (info *Info) CalculatePercentAsync() {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -54,6 +64,10 @@ func (info *Info) CalculatePercentAsync() {
 
 }
 
+// calculatePercentAsync recursive function for calculating the percentage
+// that the file occupies in the parent directory
+// get totalSize - size of parent directory
+// Using concurrency
 func (info *Info) calculatePercentAsync(totalSize int64, wg *sync.WaitGroup) {
 	defer wg.Done()
 	info.Percent = 100.0 * float64(info.Size) / float64(totalSize)
@@ -66,10 +80,12 @@ func (info *Info) calculatePercentAsync(totalSize int64, wg *sync.WaitGroup) {
 	}
 }
 
+// CalculateSize method runs recursive function for calculating the total size of directory content
 func (info *Info) CalculateSize() {
 	info.calculateSize()
 }
 
+// calculateSize recursive function for calculating the total size of directory content
 func (info *Info) calculateSize() int64 {
 	if !info.IsDir {
 		return info.Size
@@ -88,6 +104,7 @@ func SortBySizeDescending(info *Info) {
 	})
 }
 
+// Sort method sort information according to function passed as parameter
 func (info *Info) Sort(sortFunc func(info *Info)) {
 	sortFunc(info)
 	if !info.IsDir {

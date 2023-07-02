@@ -18,8 +18,8 @@ func main() {
 
 	flag.BoolVar(&sortFlag, "s", false, "sorting files and directories")
 	flag.BoolVar(&percentageFlag, "p", false, "output percent of parent directory size")
-	flag.StringVar(&exportFlag, "e", "", "write results of analyse into file")
-	flag.UintVar(&nestingFlag, "n", ^uint(0), "maximal nestingFlag of files")
+	flag.StringVar(&exportFlag, "e", "", "write results of analysis into file")
+	flag.UintVar(&nestingFlag, "n", ^uint(0), "maximal nesting level of directories to output")
 
 	// Flags and Args processing
 

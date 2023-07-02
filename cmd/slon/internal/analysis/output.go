@@ -11,9 +11,12 @@ type OutputConfig struct {
 	MaxNesting uint
 }
 
+// InfoOutput runs recursion for output information to io.Writer according to OutputConfig
 func InfoOutput(info *Info, config *OutputConfig, output io.Writer) {
 	infoOutput(info, 0, config, output)
 }
+
+// infoOutput recursive function for output information to io.Writer according to OutputConfig
 func infoOutput(info *Info, nesting int, config *OutputConfig, output io.Writer) {
 
 	if uint(nesting) > config.MaxNesting {
